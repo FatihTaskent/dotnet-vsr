@@ -8,9 +8,10 @@ using DataAcces;
 namespace dotnetvsr.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20170131234334_upvotes")]
+    partial class upvotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");
@@ -27,19 +28,6 @@ namespace dotnetvsr.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("dotnet_core.Models.Favorite", b =>
-                {
-                    b.Property<int>("AccountId");
-
-                    b.Property<int>("MessageId");
-
-                    b.HasKey("AccountId", "MessageId");
-
-                    b.HasIndex("MessageId");
-
-                    b.ToTable("Favorite");
                 });
 
             modelBuilder.Entity("dotnet_core.Models.Message", b =>
@@ -71,19 +59,6 @@ namespace dotnetvsr.Migrations
                     b.HasIndex("MessageId");
 
                     b.ToTable("Upvote");
-                });
-
-            modelBuilder.Entity("dotnet_core.Models.Favorite", b =>
-                {
-                    b.HasOne("dotnet_core.Models.Account", "Account")
-                        .WithMany("Favorites")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("dotnet_core.Models.Message", "Message")
-                        .WithMany("Favorites")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("dotnet_core.Models.Message", b =>

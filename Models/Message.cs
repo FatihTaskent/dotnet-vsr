@@ -17,8 +17,7 @@ namespace dotnet_core.Models
 
         public DateTime PostDate { get; set; }
 
-        //public virtual List<Account> Upvotes { get; set; }
-
-        //public virtual List<Account> Favorites { get; set; }
+        public List<Upvote> Upvotes { get; set; }
+        public List<Favorite> Favorites { get; set; }
     }
 }

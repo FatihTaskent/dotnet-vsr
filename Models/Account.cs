@@ -12,8 +12,7 @@ namespace dotnet_core.Models
 
         public List<Message> Messages { get; set; }
 
-       // public virtual List<Message> Upvotes { get; set; }
-
-        //public virtual List<Message> Favorites { get; set; }
+        public List<Upvote> Upvotes { get; set; }
+        public List<Favorite> Favorites { get; set; }
     }
 }
