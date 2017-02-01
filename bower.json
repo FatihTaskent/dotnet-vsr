@@ -1,5 +1,5 @@
 {
-  "name": "dotnot_vsr",
+  "name": "dotnet_vsr",
   "private": true,
   "dependencies": {
     "bootstrap": "3.3.6",
