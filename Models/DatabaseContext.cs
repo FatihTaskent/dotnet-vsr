@@ -1,7 +1,7 @@
 using dotnet_core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataAcces
+namespace DataAccess
 {
     class DatabaseContext : DbContext
     {
