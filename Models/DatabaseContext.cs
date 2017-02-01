@@ -8,6 +8,8 @@ namespace DataAcces
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Message> Messages { get; set; }
 
+        public DbSet<Tag> Tags { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
                 // Upvotes
@@ -41,7 +43,6 @@ namespace DataAcces
                     .HasOne(am => am.Message)
                     .WithMany(a => a.Favorites)
                     .HasForeignKey(am => am.MessageId);
-
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)

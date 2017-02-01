@@ -49,7 +49,13 @@ namespace dotnetvsr.Migrations
 
                     b.Property<int?>("AccountID");
 
+                    b.Property<string>("ImageUrl");
+
+                    b.Property<int?>("ParentMessageID");
+
                     b.Property<DateTime>("PostDate");
+
+                    b.Property<int?>("TagID");
 
                     b.Property<string>("Text");
 
@@ -57,7 +63,23 @@ namespace dotnetvsr.Migrations
 
                     b.HasIndex("AccountID");
 
+                    b.HasIndex("ParentMessageID");
+
+                    b.HasIndex("TagID");
+
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("dotnet_core.Models.Tag", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("dotnet_core.Models.Upvote", b =>
@@ -91,6 +113,14 @@ namespace dotnetvsr.Migrations
                     b.HasOne("dotnet_core.Models.Account", "Account")
                         .WithMany("Messages")
                         .HasForeignKey("AccountID");
+
+                    b.HasOne("dotnet_core.Models.Message", "ParentMessage")
+                        .WithMany()
+                        .HasForeignKey("ParentMessageID");
+
+                    b.HasOne("dotnet_core.Models.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagID");
                 });
 
             modelBuilder.Entity("dotnet_core.Models.Upvote", b =>
