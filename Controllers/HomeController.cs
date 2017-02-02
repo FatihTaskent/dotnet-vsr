@@ -149,8 +149,6 @@ namespace dotnet_vsr.Controllers
             string user = Request.Cookies["user"];
             var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
 
-        [HttpPost]
-        public ActionResult Details(string text, int messageId)
             // get messages with no parent id, sort by desc
             List<Message> messages = db.Messages
                                         .Include(m => m.Account)
@@ -168,22 +166,9 @@ namespace dotnet_vsr.Controllers
         }
         public ActionResult Favorites()
         {
-            // get logedin user
             string user = Request.Cookies["user"];
-            var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
             var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
 
-            // dont add message if account and text are empty
-            if(text != "" && acc != null)
-            {
-                acc.Messages.Add(new Message {
-                    Account = acc,
-                    Text = text,
-                    ParentMessage = db.Messages.SingleOrDefault(m => m.ID == messageId)
-                });
-                db.SaveChanges();
-            }
-            return RedirectToAction("Details", new { id = messageId });
             // get messages with no parent id, sort by desc
             List<Message> messages = db.Messages
                                         .Include(m => m.Account)
@@ -198,6 +183,26 @@ namespace dotnet_vsr.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Details(string text, int messageId)
+        {
+            // get logedin user
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
+
+            // dont add message if account and text are empty
+            if(text != "" && acc != null)
+            {
+                acc.Messages.Add(new Message {
+                    Account = acc,
+                    Text = text,
+                    ParentMessage = db.Messages.SingleOrDefault(m => m.ID == messageId)
+                });
+                db.SaveChanges();
+            }
+            return RedirectToAction("Details", new { id = messageId });
         }
     }
 }

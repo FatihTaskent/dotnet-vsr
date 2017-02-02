@@ -20,7 +20,6 @@
             @if(@Model.Account != null)
             {
                 <font>@Html.ActionLink("Unlike", "Unlike", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
-                <font>@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
             }
         </a>
     }    
