@@ -1,0 +1,25 @@
+@model dotnet_vsr.ViewModels.DetailsViewModel
+
+<div class="jumbotron">
+  <p>@Model.Message.PostDate</p>    
+  <h1>@Model.Message.Text</h1>
+  by <p>@Model.Message.Account.Username</p>
+</div>
+
+Replies:
+<div class="list-group">   
+    @foreach(var reply in @Model.Replies)
+    {
+
+        <a asp-action="Details" asp-route-id="@reply.ID"  class="list-group-item">
+            <h4 class="list-group-item-text"><b>@reply.Text</b></h4>
+            <p class="list-group-item-heading">@reply.PostDate by @reply.Account.Username</p>
+        </a>
+    }    
+</div>
+
+<input type="text" class="form-control" placeholder="Search for...">
+<span class="input-group-btn">
+    <button class="btn btn-default" type="button">Go!</button>
+</span>
+ 

@@ -5,24 +5,32 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using dotnet_core.Models;
 using Microsoft.EntityFrameworkCore;
+using DataAccess;
+using dotnet_vsr.ViewModels;
 
 namespace dotnet_vsr.Controllers
 {
     public class HomeController : Controller
     {
+        DatabaseContext db = new DatabaseContext();
         public IActionResult Index()
         {
-            var c = new DataAccess.DatabaseContext();
-            Account account = null;
-            try
-            {
-                account = c.Accounts.Include(x => x.Messages).First();
-            }
-            catch (InvalidOperationException ioex) { }
+            // get logedin user
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
 
-            ViewData["Account"] = account;  
-            ViewData["Message"] = "Welcome";
-            return View();
+            // get messages with no parent id, sort by desc
+            List<Message> messages = db.Messages
+                                        .Include(m => m.Account)
+                                        .Include(m => m.Upvotes)
+                                        .Where(m => m.ParentMessage == null).OrderByDescending(o => o.ID).ToList();
+
+            IndexViewModel model = new IndexViewModel {
+                Account = acc,
+                Messages = messages
+            };
+
+            return View(model);
         }
 
         public IActionResult About()
@@ -50,11 +58,12 @@ namespace dotnet_vsr.Controllers
 
             var a = c.Accounts.Include(x => x.Upvotes).Include(x => x.Messages).FirstOrDefault(x => x.ID == accountId);
 
+
             a.Upvotes.Add(upvote);
             ViewData["Account"] = a;  
             ViewData["Message"] = "Welcome";
             c.SaveChanges();
-            return View("Index");
+            return RedirectToAction("index");
         }
 
         public IActionResult Favorite(int messageId, int accountId)
@@ -68,22 +77,47 @@ namespace dotnet_vsr.Controllers
             ViewData["Account"] = a;  
             ViewData["Message"] = "Welcome";
             c.SaveChanges();
-            return View("Index");
+            return RedirectToAction("index");            
         }
 
         [HttpPost]
-        public ActionResult Index(Message model)
+        public ActionResult Index(string text)
         {
-            var c = new DataAccess.DatabaseContext();
-            if(model != null)
+            // get logedin user
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
+
+            // dont add message if account and text are empty
+            if(text != "" && acc != null)
             {
-                var a = c.Accounts.Include(x => x.Messages).First();
-                model.Account = a;
-                a.Messages.Add(model);
-                ViewData["Account"] = a;
-                c.SaveChanges();
+                acc.Messages.Add(new Message {
+                    Account = acc,
+                    Text = text
+                });
+                db.SaveChanges();
             }
-            return View();
+            return RedirectToAction("index");
+        }
+
+        public ActionResult Details(int id)
+        {
+            // get message with message id
+            Message post = db.Messages
+                                .Include(m => m.Account)
+                                .Include(m => m.Upvotes)
+                                .SingleOrDefault(m => m.ID == id);
+
+            if(post == null)
+                return RedirectToAction("index");
+
+            // get messages with this id as parent id
+            List<Message> messages = db.Messages.Include(m => m.ParentMessage).Where(m => m.ParentMessage.ID == id).ToList();
+
+            DetailsViewModel model = new DetailsViewModel {
+                Message = post,
+                Replies = messages
+            };
+            return View(model);
         }
     }
 }
