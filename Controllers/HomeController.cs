@@ -116,6 +116,10 @@ namespace dotnet_vsr.Controllers
 
         public ActionResult Details(int id)
         {
+            // get logedin user
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
+
             // get message with message id
             Message post = db.Messages
                                 .Include(m => m.Account)
@@ -127,9 +131,14 @@ namespace dotnet_vsr.Controllers
                 return RedirectToAction("index");
 
             // get messages with this id as parent id
-            List<Message> messages = db.Messages.Include(m => m.ParentMessage).Where(m => m.ParentMessage.ID == id).ToList();
+            List<Message> messages = db.Messages
+                                        .Include(m => m.ParentMessage)
+                                        .Include(m => m.Account)
+                                        .Include(m => m.Upvotes)
+                                        .Where(m => m.ParentMessage.ID == id).ToList();
 
             DetailsViewModel model = new DetailsViewModel {
+                Account = acc,
                 Message = post,
                 Replies = messages
             };
@@ -140,6 +149,8 @@ namespace dotnet_vsr.Controllers
             string user = Request.Cookies["user"];
             var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
 
+        [HttpPost]
+        public ActionResult Details(string text, int messageId)
             // get messages with no parent id, sort by desc
             List<Message> messages = db.Messages
                                         .Include(m => m.Account)
@@ -157,9 +168,22 @@ namespace dotnet_vsr.Controllers
         }
         public ActionResult Favorites()
         {
+            // get logedin user
             string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
             var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
 
+            // dont add message if account and text are empty
+            if(text != "" && acc != null)
+            {
+                acc.Messages.Add(new Message {
+                    Account = acc,
+                    Text = text,
+                    ParentMessage = db.Messages.SingleOrDefault(m => m.ID == messageId)
+                });
+                db.SaveChanges();
+            }
+            return RedirectToAction("Details", new { id = messageId });
             // get messages with no parent id, sort by desc
             List<Message> messages = db.Messages
                                         .Include(m => m.Account)

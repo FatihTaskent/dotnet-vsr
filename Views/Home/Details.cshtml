@@ -12,14 +12,24 @@ Replies:
     {
 
         <a asp-action="Details" asp-route-id="@reply.ID"  class="list-group-item">
+            <span class="badge">@reply.Upvotes.Count()</span>
             <h4 class="list-group-item-text"><b>@reply.Text</b></h4>
             <p class="list-group-item-heading">@reply.PostDate by @reply.Account.Username</p>
+            @if(@Model.Account != null)
+            {
+                <font>@Html.ActionLink("Like", "Like", "Home", new { messageId = @reply.ID, accountId = @Model.Account.ID }, new { @class = "" })</font>
+                <font>@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @reply.ID, accountId = @Model.Account.ID }, new { @class = "" })</font>
+            }
         </a>
     }    
 </div>
 
-<input type="text" class="form-control" placeholder="Search for...">
-<span class="input-group-btn">
-    <button class="btn btn-default" type="button">Go!</button>
-</span>
+@if(@Model.Account != null)
+{
+    <form asp-action="Details" method="post" class="form-horizontal">
+        <input type="hidden" name="messageId" value="@Model.Message.ID" />
+        <textarea name="text" class="form-control"></textarea>
+        <input type="submit"  class="btn btn-primary form-control" value="Reply"/>
+    </form>
+}
  
