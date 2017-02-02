@@ -25,7 +25,6 @@ namespace dotnet_vsr.Controllers
             return View();
         }
 
-
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -43,6 +42,33 @@ namespace dotnet_vsr.Controllers
         public IActionResult Error()
         {
             return View();
+        }
+        public IActionResult Like(int messageId, int accountId)
+        {
+            var c = new DataAccess.DatabaseContext();
+            var upvote = new Upvote() { MessageId = messageId, AccountId = accountId };
+
+            var a = c.Accounts.Include(x => x.Upvotes).Include(x => x.Messages).FirstOrDefault(x => x.ID == accountId);
+
+            a.Upvotes.Add(upvote);
+            ViewData["Account"] = a;  
+            ViewData["Message"] = "Welcome";
+            c.SaveChanges();
+            return View("Index");
+        }
+
+        public IActionResult Favorite(int messageId, int accountId)
+        {
+            var c = new DataAccess.DatabaseContext();
+            var favorite = new Favorite() { MessageId = messageId, AccountId = accountId };
+
+            var a = c.Accounts.Include(x => x.Favorites).Include(x => x.Messages).FirstOrDefault(x => x.ID == accountId);
+
+            a.Favorites.Add(favorite);
+            ViewData["Account"] = a;  
+            ViewData["Message"] = "Welcome";
+            c.SaveChanges();
+            return View("Index");
         }
 
         [HttpPost]
