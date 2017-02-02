@@ -1,33 +1,37 @@
 @using dotnet_core.Models
+@model dotnet_vsr.ViewModels.IndexViewModel
 
 @{
     ViewData["Title"] = "Home Page";
-    var account = ViewData["Account"] as Account;
 }
 
-<h2>@ViewData["Title"].</h2>
-<h3>@ViewData["Message"]</h3>
 
-<p>@account.Username</p>
-
-@foreach(var message in @account.Messages)
+@if(@Model.Account != null)
 {
-    <p>@message.PostDate</p>
-    <br/>
-    <p>@message.ID: @message.Text</p>
-    <br/>
-@Html.ActionLink("Like", "Like", "Home", new { messageId = @message.ID, accountId = @account.ID }, new { @class = "btn btn-primary btn-large" })
-@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID, accountId = @account.ID }, new { @class = "btn btn-primary btn-large" })
+    <h1> Welcome, Do you have any questions to ask? </h1>
+    <form asp-action="Index" method="post" class="form-horizontal">
+        <textarea name="Text" class="form-control" placeholder="Ask your question..."></textarea>
+        <input type="submit"  class="btn btn-primary form-control" value="Post Message"/>
+    </form>
 }
+<hr />
 
-@model Message
+<h4>Questions : </h4>
 
-@if(@account != null)
-{
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post)) 
+<div class="list-group">   
+    @foreach(var message in @Model.Messages)
     {
-    @Html.TextAreaFor(m => m.Text)
 
-    <input type="submit" value="Post Message" />
-    }
-}
+        <a asp-action="Details" asp-route-id="@message.ID"  class="list-group-item">
+            <span class="badge">@message.Upvotes.Count()</span>
+            <h4 class="list-group-item-text"><b>@message.Text</b></h4>
+            <p class="list-group-item-heading">@message.PostDate by @message.Account.Username</p>
+
+            @if(@Model.Account != null)
+            {
+                <font>@Html.ActionLink("Like", "Like", "Home", new { messageId = @message.ID, accountId = @Model.Account.ID }, new { @class = "" })</font>
+                <font>@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID, accountId = @Model.Account.ID }, new { @class = "" })</font>
+            }
+        </a>
+    }    
+</div>
