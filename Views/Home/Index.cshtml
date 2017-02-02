@@ -16,6 +16,8 @@
     <br/>
     <p>@message.ID: @message.Text</p>
     <br/>
+@Html.ActionLink("Like", "Like", "Home", new { messageId = @message.ID, accountId = @account.ID }, new { @class = "btn btn-primary btn-large" })
+@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID, accountId = @account.ID }, new { @class = "btn btn-primary btn-large" })
 }
 
 @model Message
