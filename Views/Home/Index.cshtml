@@ -29,8 +29,21 @@
 
             @if(@Model.Account != null)
             {
-                <font>@Html.ActionLink("Like", "Like", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
-                <font>@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
+                bool voted = false;
+                foreach(var upvote in @message.Upvotes) {
+                    if(upvote.AccountId == @Model.Account.ID) { 
+                        voted = true; } }
+                
+                bool fav = false;
+                foreach(var favorite in @message.Favorites) {
+                    if(favorite.AccountId == @Model.Account.ID) { 
+                        fav = true; } }
+                
+                string like = (voted) ? "btn btn-primary btn-small disabled": "btn btn-primary btn-small" ;
+                string favo = (fav)   ? "btn btn-primary btn-small disabled": "btn btn-primary btn-small" ;
+
+                @Html.ActionLink("Like", "Like", "Home", new { messageId = @message.ID }, new { @class = like }) 
+                @Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID }, new { @class = favo })
             }
         </a>
     }    
