@@ -2,21 +2,11 @@
 @model dotnet_vsr.ViewModels.IndexViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Likes";
 }
 
 
-@if(@Model.Account != null)
-{
-    <h1> Welcome, Do you have any questions to ask? </h1>
-    <form asp-action="Index" method="post" class="form-horizontal">
-        <textarea name="Text" class="form-control" placeholder="Ask your question..."></textarea>
-        <input type="submit"  class="btn btn-primary form-control" value="Post Message"/>
-    </form>
-}
-<hr />
-
-<h4>Questions : </h4>
+<h4>Likes : </h4>
 
 <div class="list-group">   
     @foreach(var message in @Model.Messages)
@@ -29,7 +19,7 @@
 
             @if(@Model.Account != null)
             {
-                <font>@Html.ActionLink("Like", "Like", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
+                <font>@Html.ActionLink("Unlike", "Unlike", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
                 <font>@Html.ActionLink("Favorite", "Favorite", "Home", new { messageId = @message.ID }, new { @class = "" })</font>
             }
         </a>

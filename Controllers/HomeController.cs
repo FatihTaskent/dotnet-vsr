@@ -23,7 +23,10 @@ namespace dotnet_vsr.Controllers
             List<Message> messages = db.Messages
                                         .Include(m => m.Account)
                                         .Include(m => m.Upvotes)
-                                        .Where(m => m.ParentMessage == null).OrderByDescending(o => o.ID).ToList();
+                                        .Include(m => m.Favorites)
+                                        .Where(m => m.ParentMessage == null)
+                                        .OrderByDescending(o => o.PostDate)
+                                        .ToList();
 
             IndexViewModel model = new IndexViewModel {
                 Account = acc,
@@ -51,33 +54,44 @@ namespace dotnet_vsr.Controllers
         {
             return View();
         }
-        public IActionResult Like(int messageId, int accountId)
+        public IActionResult Like(int messageId)
         {
-            var c = new DataAccess.DatabaseContext();
-            var upvote = new Upvote() { MessageId = messageId, AccountId = accountId };
+            var db = new DataAccess.DatabaseContext();
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages)
+                .Include( a => a.Upvotes)
+                .SingleOrDefault(a => a.Username == user);
 
-            var a = c.Accounts.Include(x => x.Upvotes).Include(x => x.Messages).FirstOrDefault(x => x.ID == accountId);
+            var upvote = new Upvote() { MessageId = messageId, AccountId = acc.ID };
 
-
-            a.Upvotes.Add(upvote);
-            ViewData["Account"] = a;  
-            ViewData["Message"] = "Welcome";
-            c.SaveChanges();
+            acc.Upvotes.Add(upvote);
+            db.SaveChanges();
             return RedirectToAction("index");
         }
 
-        public IActionResult Favorite(int messageId, int accountId)
+        public IActionResult Favorite(int messageId)
         {
-            var c = new DataAccess.DatabaseContext();
-            var favorite = new Favorite() { MessageId = messageId, AccountId = accountId };
+            var db = new DataAccess.DatabaseContext();
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages)
+                .Include(a => a.Favorites)
+                .SingleOrDefault(a => a.Username == user);
 
-            var a = c.Accounts.Include(x => x.Favorites).Include(x => x.Messages).FirstOrDefault(x => x.ID == accountId);
+            var favorite = new Favorite() { MessageId = messageId, AccountId = acc.ID };
 
-            a.Favorites.Add(favorite);
-            ViewData["Account"] = a;  
-            ViewData["Message"] = "Welcome";
-            c.SaveChanges();
-            return RedirectToAction("index");            
+            acc.Favorites.Add(favorite);
+            db.SaveChanges();
+            return RedirectToAction("index");
+        }
+        public IActionResult Unlike(int messageId)
+        {
+            // TODO
+            return RedirectToAction("index");
+        }
+        public IActionResult Unfavorite(int messageId)
+        {
+            // TODO
+            return RedirectToAction("index");
         }
 
         [HttpPost]
@@ -92,7 +106,8 @@ namespace dotnet_vsr.Controllers
             {
                 acc.Messages.Add(new Message {
                     Account = acc,
-                    Text = text
+                    Text = text,
+                    PostDate = DateTime.Now
                 });
                 db.SaveChanges();
             }
@@ -105,6 +120,7 @@ namespace dotnet_vsr.Controllers
             Message post = db.Messages
                                 .Include(m => m.Account)
                                 .Include(m => m.Upvotes)
+                                .Include(m => m.Favorites)
                                 .SingleOrDefault(m => m.ID == id);
 
             if(post == null)
@@ -117,6 +133,46 @@ namespace dotnet_vsr.Controllers
                 Message = post,
                 Replies = messages
             };
+            return View(model);
+        }
+        public ActionResult Likes()
+        {
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
+
+            // get messages with no parent id, sort by desc
+            List<Message> messages = db.Messages
+                                        .Include(m => m.Account)
+                                        .Include(m => m.Upvotes)
+                                        .Include(m => m.Favorites)
+                                        .Where(m => m.Upvotes.SingleOrDefault(up => up.AccountId == acc.ID) != null)
+                                        .OrderByDescending(o => o.PostDate).ToList();
+
+            IndexViewModel model = new IndexViewModel {
+                Account = acc,
+                Messages = messages
+            };
+
+            return View(model);
+        }
+        public ActionResult Favorites()
+        {
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.SingleOrDefault(a => a.Username == user);
+
+            // get messages with no parent id, sort by desc
+            List<Message> messages = db.Messages
+                                        .Include(m => m.Account)
+                                        .Include(m => m.Upvotes)
+                                        .Include(m => m.Favorites)
+                                        .Where(m => m.Favorites.SingleOrDefault(up => up.AccountId == acc.ID) != null)
+                                        .OrderByDescending(o => o.PostDate).ToList();
+
+            IndexViewModel model = new IndexViewModel {
+                Account = acc,
+                Messages = messages
+            };
+
             return View(model);
         }
     }

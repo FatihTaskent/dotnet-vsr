@@ -39,8 +39,11 @@ bool loggedin = user != null && user != "";
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    @if(loggedin)
+                    {
+                        <li><a asp-area="" asp-controller="Home" asp-action="Likes">Likes</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Favorites">Favorites</a></li>
+                    }
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     @{
