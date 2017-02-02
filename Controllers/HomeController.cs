@@ -23,6 +23,7 @@ namespace dotnet_vsr.Controllers
             List<Message> messages = db.Messages
                                         .Include(m => m.Account)
                                         .Include(m => m.Upvotes)
+                                        .Include(m => m.Favorites)
                                         .Where(m => m.ParentMessage == null).OrderByDescending(o => o.ID).ToList();
 
             IndexViewModel model = new IndexViewModel {
@@ -88,7 +89,7 @@ namespace dotnet_vsr.Controllers
             var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
 
             // dont add message if account and text are empty
-            if(text != "" && acc != null)
+            if(text != null && acc != null)
             {
                 acc.Messages.Add(new Message {
                     Account = acc,
@@ -119,6 +120,7 @@ namespace dotnet_vsr.Controllers
                                         .Include(m => m.ParentMessage)
                                         .Include(m => m.Account)
                                         .Include(m => m.Upvotes)
+                                        .Include(m => m.Favorites)                                
                                         .Where(m => m.ParentMessage.ID == id).ToList();
 
             DetailsViewModel model = new DetailsViewModel {
@@ -137,7 +139,7 @@ namespace dotnet_vsr.Controllers
             var acc = db.Accounts.Include(a => a.Messages).SingleOrDefault(a => a.Username == user);
 
             // dont add message if account and text are empty
-            if(text != "" && acc != null)
+            if(text != null && acc != null)
             {
                 acc.Messages.Add(new Message {
                     Account = acc,
