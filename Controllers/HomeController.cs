@@ -56,7 +56,6 @@ namespace dotnet_vsr.Controllers
         }
         public IActionResult Like(int messageId)
         {
-            var db = new DataAccess.DatabaseContext();
             string user = Request.Cookies["user"];
             var acc = db.Accounts.Include(a => a.Messages)
                 .Include( a => a.Upvotes)
@@ -71,7 +70,6 @@ namespace dotnet_vsr.Controllers
 
         public IActionResult Favorite(int messageId)
         {
-            var db = new DataAccess.DatabaseContext();
             string user = Request.Cookies["user"];
             var acc = db.Accounts.Include(a => a.Messages)
                 .Include(a => a.Favorites)
@@ -85,13 +83,29 @@ namespace dotnet_vsr.Controllers
         }
         public IActionResult Unlike(int messageId)
         {
-            // TODO
-            return RedirectToAction("index");
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages)
+                .Include( a => a.Upvotes)
+                .SingleOrDefault(a => a.Username == user);
+
+            var messageToDelete = acc.Upvotes.SingleOrDefault(x => x.MessageId == messageId);
+            acc.Upvotes.Remove(messageToDelete);
+            db.SaveChanges();
+
+            return RedirectToAction("likes");
         }
         public IActionResult Unfavorite(int messageId)
         {
-            // TODO
-            return RedirectToAction("index");
+            string user = Request.Cookies["user"];
+            var acc = db.Accounts.Include(a => a.Messages)
+                .Include( a => a.Favorites)
+                .SingleOrDefault(a => a.Username == user);
+
+            var messageToDelete = acc.Favorites.SingleOrDefault(x => x.MessageId == messageId);
+            acc.Favorites.Remove(messageToDelete);
+            db.SaveChanges();
+
+            return RedirectToAction("favorites");
         }
 
         [HttpPost]
