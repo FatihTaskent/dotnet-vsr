@@ -1,0 +1,11 @@
+FROM microsoft/dotnet:latest
+
+COPY . /dotnet-vsr
+
+WORKDIR /dotnet-vsr
+
+RUN dotnet restore
+
+RUN dotnet publish -o /output
+
+VOLUME /output
