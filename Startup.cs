@@ -58,6 +58,10 @@ namespace dotnet_vsr
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            DataAccess.DatabaseContext db = new DataAccess.DatabaseContext();
+            db.Database.EnsureCreated();
+
         }
     }
 }
